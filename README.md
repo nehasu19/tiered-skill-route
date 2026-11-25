@@ -10,7 +10,9 @@ tiered-skill-router/
 │   ├── validator.py                    PASS / "FAIL: <reason>", runs scripts/validate.py
 │   ├── router.py                       routing, retries, escalation, Mock + LiteLLM backends
 │   └── metrics.py                      tier, retries, escalations, tokens, cost, rates
-├── skills/sample-json-extractor/       working sample skill + validator
+├── skills/sample-json-extractor/       working sample skill + validator + evals.json
+├── compare.py                          live head-to-head model comparison
+├── .claude/skills/compare-models/      /compare-models slash command for Claude Code
 └── tests/                              eval_cases.json + parameterized benchmarks
 ```
 
@@ -60,9 +62,23 @@ run = router.run(Task(skill="sample-json-extractor", input="Ada <ada@example.com
 print(run.validation, run.metrics, router.tracker.summary())
 ```
 
+## Comparing models
+
+Run one skill live on several models, one attempt per input (no retries or escalation), and print pass count, errors, tokens, cost and seconds per run:
+
+```bash
+export ANTHROPIC_API_KEY=... OPENAI_API_KEY=... GEMINI_API_KEY=...   # set only what you have
+python compare.py claude-opus-5-5 openai/gpt-5 gemini/gemini-2.5-pro
+python compare.py --skill my-skill modelA modelB
+```
+
+In Claude Code from the repo root: `/compare-models claude-opus-5-5 openai/gpt-5`.
+
+Inputs come from `skills/<skill>/evals.json` (a JSON list of input strings). Models whose provider key is unset are skipped. Costs come from litellm's price table (0 if a model is missing). This spends real money. Keys are read from environment variables only.
+
 ## Adding a skill
 
 1. Create `skills/<name>/SKILL.md` with frontmatter `name` (lowercase-hyphen, equals the folder name) and `description`, then the instructions.
 2. Optional: `scripts/validate.py` (reads the output on stdin and the source text from `$SKILL_INPUT`, prints `PASS` or `FAIL: <reason>`, exit 0 on pass; runs with a minimal env, 10s timeout) and `references/`.
 3. Optional routing: `routing.skill_rules.<name>.min_tier` in the config.
-4. Add cases to `tests/eval_cases.json`.
+4. Add cases to `tests/eval_cases.json`, and a list of inputs to `skills/<name>/evals.json` for `compare.py`.
