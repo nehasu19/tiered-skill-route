@@ -1,0 +1,254 @@
+[
+  {
+    "id": "simple-passes-tier1",
+    "kind": "positive",
+    "input": "Invoice from Ada Lovelace <ada@example.com>, total 120.50 due Friday.",
+    "mock": {
+      "good": "{\"name\": \"Ada Lovelace\", \"email\": \"ada@example.com\", \"amount\": 120.5}"
+    },
+    "expect": {
+      "start_tier": 1,
+      "final_tier": 1,
+      "attempts": 1,
+      "passed": true,
+      "retries": 0,
+      "escalations": 0
+    }
+  },
+  {
+    "id": "retry-same-tier-then-pass",
+    "kind": "positive",
+    "input": "Invoice from Ada Lovelace <ada@example.com>, total 120.50 due Friday.",
+    "mock": {
+      "good": "{\"name\": \"Ada Lovelace\", \"email\": \"ada@example.com\", \"amount\": 120.5}",
+      "fail_first_calls": 1
+    },
+    "expect": {
+      "start_tier": 1,
+      "final_tier": 1,
+      "attempts": 2,
+      "passed": true,
+      "retries": 1,
+      "escalations": 0
+    }
+  },
+  {
+    "id": "escalate-1-to-2",
+    "kind": "positive",
+    "input": "Invoice from Ada Lovelace <ada@example.com>, total 120.50 due Friday.",
+    "mock": {
+      "good": "{\"name\": \"Ada Lovelace\", \"email\": \"ada@example.com\", \"amount\": 120.5}",
+      "min_tier": 2,
+      "bad": "Sure! Here you go"
+    },
+    "expect": {
+      "start_tier": 1,
+      "final_tier": 2,
+      "attempts": 3,
+      "passed": true,
+      "retries": 1,
+      "escalations": 1
+    }
+  },
+  {
+    "id": "escalate-1-to-3",
+    "kind": "positive",
+    "input": "Invoice from Ada Lovelace <ada@example.com>, total 120.50 due Friday.",
+    "mock": {
+      "good": "{\"name\": \"Ada Lovelace\", \"email\": \"ada@example.com\", \"amount\": 120.5}",
+      "min_tier": 3,
+      "bad": "{}"
+    },
+    "expect": {
+      "start_tier": 1,
+      "final_tier": 3,
+      "attempts": 5,
+      "passed": true,
+      "retries": 2,
+      "escalations": 2
+    }
+  },
+  {
+    "id": "multi-step-routes-tier2",
+    "kind": "positive",
+    "input": "Invoice from Ada Lovelace <ada@example.com>, total 120.50 due Friday.",
+    "mock": {
+      "good": "{\"name\": \"Ada Lovelace\", \"email\": \"ada@example.com\", \"amount\": 120.5}"
+    },
+    "expect": {
+      "start_tier": 2,
+      "final_tier": 2,
+      "attempts": 1,
+      "passed": true,
+      "retries": 0,
+      "escalations": 0
+    },
+    "complexity": "multi_step"
+  },
+  {
+    "id": "hard-routes-tier3",
+    "kind": "positive",
+    "input": "Invoice from Ada Lovelace <ada@example.com>, total 120.50 due Friday.",
+    "mock": {
+      "good": "{\"name\": \"Ada Lovelace\", \"email\": \"ada@example.com\", \"amount\": 120.5}"
+    },
+    "expect": {
+      "start_tier": 3,
+      "final_tier": 3,
+      "attempts": 1,
+      "passed": true,
+      "retries": 0,
+      "escalations": 0
+    },
+    "complexity": "hard"
+  },
+  {
+    "id": "plan-step-routes-tier2",
+    "kind": "positive",
+    "input": "Invoice from Ada Lovelace <ada@example.com>, total 120.50 due Friday.",
+    "mock": {
+      "good": "{\"name\": \"Ada Lovelace\", \"email\": \"ada@example.com\", \"amount\": 120.5}"
+    },
+    "expect": {
+      "start_tier": 2,
+      "final_tier": 2,
+      "attempts": 1,
+      "passed": true,
+      "retries": 0,
+      "escalations": 0
+    },
+    "step": "plan"
+  },
+  {
+    "id": "case-rule-routes-tier3",
+    "kind": "positive",
+    "input": "Invoice from Ada Lovelace <ada@example.com>, total 120.50 due Friday.",
+    "mock": {
+      "good": "{\"name\": \"Ada Lovelace\", \"email\": \"ada@example.com\", \"amount\": 120.5}"
+    },
+    "expect": {
+      "start_tier": 3,
+      "final_tier": 3,
+      "attempts": 1,
+      "passed": true,
+      "retries": 0,
+      "escalations": 0
+    },
+    "case_id_override": "known-ambiguous"
+  },
+  {
+    "id": "long-input-routes-tier2",
+    "kind": "edge",
+    "input": "Invoice from Ada Lovelace <ada@example.com>, total 120.50 due Friday.",
+    "mock": {
+      "good": "{\"name\": \"Ada Lovelace\", \"email\": \"ada@example.com\", \"amount\": 120.5}"
+    },
+    "expect": {
+      "start_tier": 2,
+      "final_tier": 2,
+      "attempts": 1,
+      "passed": true,
+      "retries": 0,
+      "escalations": 0
+    },
+    "pad_chars": 9000
+  },
+  {
+    "id": "very-long-input-routes-tier3",
+    "kind": "edge",
+    "input": "Invoice from Ada Lovelace <ada@example.com>, total 120.50 due Friday.",
+    "mock": {
+      "good": "{\"name\": \"Ada Lovelace\", \"email\": \"ada@example.com\", \"amount\": 120.5}"
+    },
+    "expect": {
+      "start_tier": 3,
+      "final_tier": 3,
+      "attempts": 1,
+      "passed": true,
+      "retries": 0,
+      "escalations": 0
+    },
+    "pad_chars": 40000
+  },
+  {
+    "id": "never-passes-hits-attempt-cap",
+    "kind": "negative",
+    "input": "Invoice from Ada Lovelace <ada@example.com>, total 120.50 due Friday.",
+    "mock": {
+      "good": "{\"name\": \"Ada Lovelace\", \"email\": \"ada@example.com\", \"amount\": 120.5}",
+      "min_tier": 99
+    },
+    "expect": {
+      "start_tier": 1,
+      "final_tier": 3,
+      "attempts": 6,
+      "passed": false,
+      "retries": 3,
+      "escalations": 2
+    }
+  },
+  {
+    "id": "hallucinated-email-rejected",
+    "kind": "negative",
+    "input": "Invoice from Ada Lovelace <ada@example.com>, total 120.50 due Friday.",
+    "mock": {
+      "good": "{\"name\": \"Ada Lovelace\", \"email\": \"bob@evil.com\", \"amount\": 120.5}"
+    },
+    "expect": {
+      "start_tier": 1,
+      "final_tier": 3,
+      "attempts": 6,
+      "passed": false,
+      "retries": 3,
+      "escalations": 2
+    }
+  },
+  {
+    "id": "empty-output-rejected",
+    "kind": "edge",
+    "input": "Invoice from Ada Lovelace <ada@example.com>, total 120.50 due Friday.",
+    "mock": {
+      "good": ""
+    },
+    "expect": {
+      "start_tier": 1,
+      "final_tier": 3,
+      "attempts": 6,
+      "passed": false,
+      "retries": 3,
+      "escalations": 2
+    }
+  },
+  {
+    "id": "code-fenced-json-rejected",
+    "kind": "edge",
+    "input": "Invoice from Ada Lovelace <ada@example.com>, total 120.50 due Friday.",
+    "mock": {
+      "good": "```json\n{\"name\": \"Ada Lovelace\", \"email\": \"ada@example.com\", \"amount\": 120.5}\n```"
+    },
+    "expect": {
+      "start_tier": 1,
+      "final_tier": 3,
+      "attempts": 6,
+      "passed": false,
+      "retries": 3,
+      "escalations": 2
+    }
+  },
+  {
+    "id": "extra-key-rejected",
+    "kind": "negative",
+    "input": "Invoice from Ada Lovelace <ada@example.com>, total 120.50 due Friday.",
+    "mock": {
+      "good": "{\"name\": \"A\", \"email\": \"ada@example.com\", \"amount\": 1, \"x\": 1}"
+    },
+    "expect": {
+      "start_tier": 1,
+      "final_tier": 3,
+      "attempts": 6,
+      "passed": false,
+      "retries": 3,
+      "escalations": 2
+    }
+  }
+]
